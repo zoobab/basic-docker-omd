@@ -64,7 +64,8 @@ The easiest solution is just use rsync to copy the files across.
 For that first you need to get the private **insecure** private key from the container:
 
 	# Get the private key from the container
-	$ docker run --entrypoint="/usr/bin/print_ssh_private_key" 9357db68c675 > insecure_docker_omd_key.pem
+	docker run --entrypoint="/usr/bin/print_ssh_private_key" springersbm/basic-docker-omd:latest > insecure_docker_omd_key.pem
+	chmod 600 insecure_docker_omd_key.pem 
 		
 
 Then, start docker exposing also the SSH port:

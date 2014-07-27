@@ -31,13 +31,17 @@ RUN apt-get -y install omd
 # Install some tooling
 RUN apt-get -y install net-tools netcat xinetd wget 
 
-# Start some services
-RUN /etc/init.d/apache2 start 
-RUN /etc/init.d/xinetd start 
-
 # Install the agent to monitor localhost
 RUN wget http://mathias-kettner.de/download/check-mk-agent_1.2.4p5-2_all.deb -P /tmp/
 RUN dpkg -i /tmp/check-mk-agent_1.2.4p5-2_all.deb
+
+# Fix some stuff in apache: no change ulimit and give the server a name
+RUN echo "APACHE_ULIMIT_MAX_FILES=true" >> /etc/apache2/envvars
+RUN echo ServerName basic-docker-omd > /etc/apache2/conf-available/docker-servername.conf
+RUN a2enconf docker-servername
+
+# Fix warning in syslog-ng in ubuntu 13.10: https://bugs.launchpad.net/ubuntu/+source/syslog-ng/+bug/1009920
+RUN sed -i 's/^SYSLOGNG_OPTS.*/SYSLOGNG_OPTS="--no-caps --default-modules=affile,afprog,afsocket,afuser,basicfuncs,csvparser,dbparser,syslogformat"/' /etc/default/syslog-ng
 
 #####################################################################################
 # Setup the initial OMD site 'master'
@@ -75,9 +79,6 @@ ADD hosts.mk /omd/sites/master/etc/check_mk/conf.d/wato/hosts.mk
 # First OMD service discovery and compile
 RUN /etc/init.d/xinetd start && su - master -c "cmk -II"
 RUN su - master -c "cmk -R"
-
-# Ensure the permissions are right
-RUN chown -R master.master /omd/sites/master
 
 #####################################################################################
 # Other stuff
