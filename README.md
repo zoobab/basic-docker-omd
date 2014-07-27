@@ -26,6 +26,8 @@ Default credentials:
  * Login: omdadmin
  * Pass: omd
  
+**NOTE** Localhost will display some warnings from incorrect mountpoints, interfaces. That's due the services autodiscovered while the creation of the image. It is not important. Run `su - master -c 'cmd -u -II && cmk -R'` to regenerate the config.
+ 
 Moving around
 -------------
 

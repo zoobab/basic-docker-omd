@@ -80,6 +80,9 @@ ADD hosts.mk /omd/sites/master/etc/check_mk/conf.d/wato/hosts.mk
 RUN /etc/init.d/xinetd start && su - master -c "cmk -II"
 RUN su - master -c "cmk -R"
 
+# Fix some permission issues (not sure why it happens)
+RUN chown master.master /omd/sites/master/etc
+
 #####################################################################################
 # Other stuff
 # Generate the SSH keys of the server
@@ -93,7 +96,7 @@ ADD ssh/id_rsa.pub /root/.ssh/authorized_keys
 ADD ssh/id_rsa /omd/sites/master/.ssh/id_rsa
 ADD ssh/id_rsa.pub /omd/sites/master/.ssh/id_rsa.pub
 ADD ssh/id_rsa.pub /omd/sites/master/.ssh/authorized_keys
-RUN chmod 400 /root/.ssh/id_rsa /omd/sites/master/.ssh/id_rsa
+RUN chmod 400 /root/.ssh/id_rsa /omd/sites/master/.ssh/id_rsa 
 
 # Utility script to print the ssh key
 # The user can use: docker run --entrypoint="/usr/bin/print_ssh_private_key" <image>
