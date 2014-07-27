@@ -76,6 +76,32 @@ ADD hosts.mk /omd/sites/master/etc/check_mk/conf.d/wato/hosts.mk
 RUN /etc/init.d/xinetd start && su - master -c "cmk -II"
 RUN su - master -c "cmk -R"
 
+# Ensure the permissions are right
+RUN chown -R master.master /omd/sites/master
+
+#####################################################################################
+# Other stuff
+# Generate the SSH keys of the server
+RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
+
+# Copy ssh key for root and master
+RUN mkdir -p /omd/sites/master/.ssh /root/.ssh
+ADD ssh/id_rsa /root/.ssh/id_rsa
+ADD ssh/id_rsa.pub /root/.ssh/id_rsa.pub
+ADD ssh/id_rsa.pub /root/.ssh/authorized_keys
+ADD ssh/id_rsa /omd/sites/master/.ssh/id_rsa
+ADD ssh/id_rsa.pub /omd/sites/master/.ssh/id_rsa.pub
+ADD ssh/id_rsa.pub /omd/sites/master/.ssh/authorized_keys
+RUN chmod 400 /root/.ssh/id_rsa /omd/sites/master/.ssh/id_rsa
+
+# Utility script to print the ssh key
+# The user can use: docker run --entrypoint="/usr/bin/print_ssh_private_key" <image>
+ADD print_ssh_private_key /usr/bin/print_ssh_private_key
+
+# Unlock the user master to allow SSH access
+RUN usermod -p master1 master
+RUN passwd -u master
+
 # Add scripts to start services in baseimage my_init:
 ADD 10_startup_base_services /etc/my_init.d/10_startup_base_services
 ADD 20_startup_omd_master /etc/my_init.d/20_startup_omd_master
