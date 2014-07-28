@@ -41,6 +41,14 @@ Some basic information:
    * Run `cmk -II` to discover new check_mk services.
    * Run `cmk -R` to recompile nagios configuration.
 
+Note about DNS
+--------------
+
+If you want to monitor servers in your internal network, and the DNS name is resolved internally, you might need to specify an internal DNS server in docker:
+
+	docker run --dns <local dns ip> -p 8888:80 --rm -t -i springersbm/basic-docker-omd:latest /sbin/my_init -- bash -l
+
+
 How to test check_mk configurations (linux)
 -------------------------------------------
 
