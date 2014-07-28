@@ -81,7 +81,7 @@ RUN /etc/init.d/xinetd start && su - master -c "cmk -II"
 RUN su - master -c "cmk -R"
 
 # Fix some permission issues (not sure why it happens)
-RUN chown master.master /omd/sites/master/etc
+RUN chown -R master.master /omd/sites/master
 
 #####################################################################################
 # Other stuff
